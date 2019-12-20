@@ -16,7 +16,8 @@ def get_delete_update_forged(request, pk):
         return Response(status = status.HTTP_404_NOT_FOUND)  
 
     if request.method == 'GET':
-        return Response({})
+        serializer = ForgedSerializer(forged)
+        return Response(serializer.data)
     elif request.method == 'DELETE':
         return Response({})          
     elif request.method == 'PUT':
@@ -24,8 +25,20 @@ def get_delete_update_forged(request, pk):
 
 
 @api_view(['GET', 'POST'])
-def get_post_forges(request):
-    if requested.method == 'GET':
-        return Response({})
-    elif requested.method == 'POST': 
-        return Response({})            
+def get_post_forged(request):
+    if request.method == 'GET':
+        forged = Forged.objects.all()
+        serializer = ForgedSerializer(forged, many=True)
+        return Response(serializer.data)
+    if request.method == 'POST':
+        data = {
+            'name': request.data.get('name'),
+            'length': int(request.data.get('length')),
+            'blade': request.data.get('blade'),
+            'steelgrade': request.data.get('steelgrade')
+        } 
+        serializer = ForgedSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)    
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)            
